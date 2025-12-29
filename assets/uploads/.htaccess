@@ -1,0 +1,15 @@
+# Security: Block PHP execution in uploads folder
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+
+# Alternative for older Apache versions
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.php$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Disable PHP engine entirely
+php_flag engine off

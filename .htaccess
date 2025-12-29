@@ -1,0 +1,40 @@
+# DPV Hub - Security .htaccess
+
+# Protect sensitive files from direct access
+<FilesMatch "(^\.env|config\.php|db\.php|mail_service\.php|\.sql|\.json|composer\.*)$">
+    Require all denied
+</FilesMatch>
+
+# Alternative for older Apache
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(^\.env|config\.php|db\.php|mail_service\.php|\.sql|\.json)$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Block access to includes folder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # HTTPS Enforcement (uncomment for production)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    RewriteRule ^includes/ - [F,L]
+    RewriteRule ^lib/ - [F,L]
+</IfModule>
+
+# Security headers (backup if PHP headers fail)
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# UTF-8 encoding
+AddDefaultCharset UTF-8

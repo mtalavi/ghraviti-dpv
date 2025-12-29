@@ -1,0 +1,1233 @@
+/**
+ * ============================================================
+ *  DPV Hub - Unified Design System
+ *  Version: 2.0.0
+ *  Mobile-First, Premium UI/UX
+ * ============================================================
+ * 
+ *  To change the theme globally, modify the CSS variables in 
+ *  the :root section. All components will update automatically.
+ * 
+ *  Structure:
+ *  1. CSS Variables (Theme)
+ *  2. Base Styles
+ *  3. Layout Components
+ *  4. Page Headers
+ *  5. Stats Cards
+ *  6. Data Cards
+ *  7. Tables
+ *  8. Forms
+ *  9. Buttons
+ * 10. Alerts & Notifications
+ * 11. Modals
+ * 12. Search Components
+ * 13. Badges & Pills
+ * 14. Utility Classes
+ * 15. Animations
+ * 16. Responsive Breakpoints
+ */
+
+/* ============================================================
+   1. CSS VARIABLES (THEME)
+   ============================================================ */
+:root {
+    /* Primary Gradient */
+    --dpv-primary-start: #667eea;
+    --dpv-primary-end: #764ba2;
+    --dpv-primary-gradient: linear-gradient(135deg, var(--dpv-primary-start) 0%, var(--dpv-primary-end) 100%);
+
+    /* Success Colors */
+    --dpv-success-start: #10b981;
+    --dpv-success-end: #059669;
+    --dpv-success-gradient: linear-gradient(135deg, var(--dpv-success-start) 0%, var(--dpv-success-end) 100%);
+    --dpv-success-light: #d1fae5;
+    --dpv-success-lighter: #ecfdf5;
+    --dpv-success-text: #065f46;
+
+    /* Danger Colors */
+    --dpv-danger-start: #ef4444;
+    --dpv-danger-end: #dc2626;
+    --dpv-danger-gradient: linear-gradient(135deg, var(--dpv-danger-start) 0%, var(--dpv-danger-end) 100%);
+    --dpv-danger-light: #fecaca;
+    --dpv-danger-lighter: #fef2f2;
+    --dpv-danger-text: #991b1b;
+
+    /* Warning Colors */
+    --dpv-warning-start: #f59e0b;
+    --dpv-warning-end: #d97706;
+    --dpv-warning-gradient: linear-gradient(135deg, var(--dpv-warning-start) 0%, var(--dpv-warning-end) 100%);
+    --dpv-warning-light: #fde68a;
+    --dpv-warning-lighter: #fffbeb;
+    --dpv-warning-text: #92400e;
+
+    /* Info Colors */
+    --dpv-info-start: #3b82f6;
+    --dpv-info-end: #2563eb;
+    --dpv-info-gradient: linear-gradient(135deg, var(--dpv-info-start) 0%, var(--dpv-info-end) 100%);
+    --dpv-info-light: #bfdbfe;
+    --dpv-info-lighter: #dbeafe;
+    --dpv-info-text: #1e40af;
+
+    /* Purple Accent */
+    --dpv-purple-start: #a855f7;
+    --dpv-purple-end: #7c3aed;
+    --dpv-purple-gradient: linear-gradient(135deg, var(--dpv-purple-start) 0%, var(--dpv-purple-end) 100%);
+    --dpv-purple-light: #e9d5ff;
+    --dpv-purple-lighter: #f3e8ff;
+    --dpv-purple-text: #7c3aed;
+
+    /* Neutral Colors */
+    --dpv-slate-50: #f8fafc;
+    --dpv-slate-100: #f1f5f9;
+    --dpv-slate-200: #e2e8f0;
+    --dpv-slate-300: #cbd5e1;
+    --dpv-slate-400: #94a3b8;
+    --dpv-slate-500: #64748b;
+    --dpv-slate-600: #475569;
+    --dpv-slate-700: #334155;
+    --dpv-slate-800: #1e293b;
+    --dpv-slate-900: #0f172a;
+
+    /* Surface Colors */
+    --dpv-surface: #ffffff;
+    --dpv-surface-hover: #fafbfc;
+    --dpv-surface-elevated: #ffffff;
+    --dpv-surface-glass: rgba(255, 255, 255, 0.78);
+
+    /* Border Radius */
+    --dpv-radius-sm: 8px;
+    --dpv-radius-md: 12px;
+    --dpv-radius-lg: 16px;
+    --dpv-radius-xl: 20px;
+    --dpv-radius-2xl: 24px;
+    --dpv-radius-pill: 999px;
+
+    /* Shadows */
+    --dpv-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+    --dpv-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --dpv-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+    --dpv-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    --dpv-shadow-primary: 0 10px 40px rgba(102, 126, 234, 0.3);
+    --dpv-shadow-success: 0 4px 14px rgba(16, 185, 129, 0.25);
+    --dpv-shadow-danger: 0 4px 14px rgba(239, 68, 68, 0.25);
+
+    /* Transitions */
+    --dpv-transition-fast: 0.15s ease;
+    --dpv-transition-base: 0.2s ease;
+    --dpv-transition-slow: 0.3s ease;
+
+    /* Typography */
+    --dpv-font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --dpv-font-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+    /* Z-Index Scale */
+    --dpv-z-dropdown: 100;
+    --dpv-z-sticky: 200;
+    --dpv-z-modal-backdrop: 900;
+    --dpv-z-modal: 1000;
+    --dpv-z-toast: 1100;
+}
+
+/* ============================================================
+   2. BASE STYLES
+   ============================================================ */
+.dpv-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+@media (min-width: 768px) {
+    .dpv-container {
+        padding: 2rem 1.5rem;
+    }
+}
+
+.dpv-space-y-4>*+* {
+    margin-top: 1rem;
+}
+
+.dpv-space-y-6>*+* {
+    margin-top: 1.5rem;
+}
+
+/* ============================================================
+   3. LAYOUT COMPONENTS
+   ============================================================ */
+.dpv-section-card {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-2xl);
+    box-shadow: var(--dpv-shadow-md);
+    border: 1px solid var(--dpv-slate-200);
+    padding: 1.25rem;
+    transition: box-shadow var(--dpv-transition-base);
+}
+
+@media (min-width: 768px) {
+    .dpv-section-card {
+        padding: 1.5rem;
+    }
+}
+
+.dpv-section-card:hover {
+    box-shadow: var(--dpv-shadow-lg);
+}
+
+.dpv-section-card--no-hover:hover {
+    box-shadow: var(--dpv-shadow-md);
+}
+
+/* ============================================================
+   4. PAGE HEADERS
+   ============================================================ */
+.dpv-page-header {
+    background: var(--dpv-primary-gradient);
+    border-radius: var(--dpv-radius-2xl);
+    padding: 1.25rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--dpv-shadow-primary);
+}
+
+@media (min-width: 768px) {
+    .dpv-page-header {
+        padding: 1.75rem;
+    }
+}
+
+.dpv-page-header__eyebrow {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+}
+
+.dpv-page-header__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    .dpv-page-header__title {
+        font-size: 1.75rem;
+    }
+}
+
+.dpv-page-header__subtitle {
+    opacity: 0.9;
+    font-size: 0.875rem;
+}
+
+.dpv-page-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .dpv-page-header__layout {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .dpv-page-header__actions {
+        margin-top: 0;
+    }
+}
+
+.dpv-page-header__btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.625rem 1rem;
+    border-radius: var(--dpv-radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--dpv-transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-align: center;
+    justify-content: center;
+}
+
+.dpv-page-header__btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 767px) {
+    .dpv-page-header__btn {
+        flex: 1;
+        min-width: calc(50% - 0.25rem);
+    }
+}
+
+/* ============================================================
+   5. STATS CARDS
+   ============================================================ */
+.dpv-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .dpv-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+}
+
+.dpv-stat-card {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-xl);
+    padding: 1rem;
+    box-shadow: var(--dpv-shadow-md);
+    border: 1px solid var(--dpv-slate-200);
+    text-align: center;
+    transition: transform var(--dpv-transition-fast), box-shadow var(--dpv-transition-fast);
+}
+
+@media (min-width: 768px) {
+    .dpv-stat-card {
+        padding: 1.25rem;
+    }
+}
+
+.dpv-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--dpv-shadow-lg);
+}
+
+.dpv-stat-card__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--dpv-primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@media (min-width: 768px) {
+    .dpv-stat-card__value {
+        font-size: 2rem;
+    }
+}
+
+.dpv-stat-card__label {
+    font-size: 0.8rem;
+    color: var(--dpv-slate-500);
+    margin-top: 0.25rem;
+}
+
+/* Colored Stat Cards */
+.dpv-stat-card--success {
+    background: var(--dpv-success-lighter);
+    border-color: var(--dpv-success-light);
+}
+
+.dpv-stat-card--success .dpv-stat-card__value {
+    background: var(--dpv-success-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.dpv-stat-card--success .dpv-stat-card__label {
+    color: var(--dpv-success-text);
+}
+
+.dpv-stat-card--info {
+    background: var(--dpv-info-lighter);
+    border-color: var(--dpv-info-light);
+}
+
+.dpv-stat-card--info .dpv-stat-card__value {
+    color: var(--dpv-info-text);
+    -webkit-text-fill-color: var(--dpv-info-text);
+}
+
+.dpv-stat-card--info .dpv-stat-card__label {
+    color: var(--dpv-info-text);
+}
+
+.dpv-stat-card--warning {
+    background: var(--dpv-warning-lighter);
+    border-color: var(--dpv-warning-light);
+}
+
+.dpv-stat-card--warning .dpv-stat-card__value {
+    color: var(--dpv-warning-text);
+    -webkit-text-fill-color: var(--dpv-warning-text);
+}
+
+.dpv-stat-card--warning .dpv-stat-card__label {
+    color: var(--dpv-warning-text);
+}
+
+.dpv-stat-card--purple {
+    background: var(--dpv-purple-lighter);
+    border-color: var(--dpv-purple-light);
+}
+
+.dpv-stat-card--purple .dpv-stat-card__value {
+    color: var(--dpv-purple-text);
+    -webkit-text-fill-color: var(--dpv-purple-text);
+}
+
+.dpv-stat-card--purple .dpv-stat-card__label {
+    color: var(--dpv-purple-text);
+}
+
+/* ============================================================
+   6. DATA CARDS (Mobile-First Expandable Cards)
+   ============================================================ */
+.dpv-data-card {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--dpv-shadow-md);
+    border: 1px solid var(--dpv-slate-200);
+    margin-bottom: 1rem;
+    transition: all var(--dpv-transition-slow);
+}
+
+.dpv-data-card:hover {
+    box-shadow: var(--dpv-shadow-lg);
+    transform: translateY(-2px);
+}
+
+.dpv-data-card__header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, var(--dpv-slate-50) 0%, var(--dpv-slate-100) 100%);
+    border-bottom: 1px solid var(--dpv-slate-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 1rem;
+}
+
+.dpv-data-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dpv-data-card__primary {
+    font-family: var(--dpv-font-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dpv-slate-800);
+    letter-spacing: 0.5px;
+}
+
+.dpv-data-card__secondary {
+    font-size: 0.9rem;
+    color: var(--dpv-slate-600);
+    margin-top: 0.125rem;
+}
+
+.dpv-data-card__tertiary {
+    font-size: 0.8rem;
+    color: var(--dpv-slate-500);
+    margin-top: 0.25rem;
+}
+
+.dpv-data-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dpv-data-card__expand {
+    font-size: 1.2rem;
+    transition: transform var(--dpv-transition-slow);
+    color: var(--dpv-slate-400);
+}
+
+.dpv-data-card.expanded .dpv-data-card__expand {
+    transform: rotate(180deg);
+}
+
+.dpv-data-card__body {
+    padding: 1.25rem;
+    display: none;
+}
+
+.dpv-data-card.expanded .dpv-data-card__body {
+    display: block;
+}
+
+/* ============================================================
+   7. TABLES (Desktop)
+   ============================================================ */
+.dpv-table-container {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--dpv-shadow-md);
+    border: 1px solid var(--dpv-slate-200);
+}
+
+.dpv-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dpv-table thead {
+    background: linear-gradient(135deg, var(--dpv-slate-50) 0%, var(--dpv-slate-100) 100%);
+}
+
+.dpv-table th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dpv-slate-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--dpv-slate-200);
+}
+
+.dpv-table td {
+    padding: 1rem 1.25rem;
+    vertical-align: top;
+    border-bottom: 1px solid var(--dpv-slate-100);
+}
+
+.dpv-table tbody tr {
+    transition: background var(--dpv-transition-fast);
+}
+
+.dpv-table tbody tr:hover {
+    background: var(--dpv-surface-hover);
+}
+
+.dpv-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================================
+   8. FORMS
+   ============================================================ */
+.dpv-form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.dpv-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dpv-slate-700);
+    margin-bottom: 0.375rem;
+}
+
+.dpv-input {
+    width: 100%;
+    border-radius: var(--dpv-radius-md);
+    border: 2px solid var(--dpv-slate-200);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: var(--dpv-slate-50);
+    transition: all var(--dpv-transition-fast);
+    font-family: inherit;
+}
+
+.dpv-input:focus {
+    outline: none;
+    background: var(--dpv-surface);
+    border-color: var(--dpv-primary-start);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.dpv-input--error {
+    border-color: var(--dpv-danger-start) !important;
+    background: var(--dpv-danger-lighter) !important;
+}
+
+.dpv-input-help {
+    font-size: 0.75rem;
+    color: var(--dpv-slate-500);
+    margin-top: 0.25rem;
+}
+
+.dpv-select {
+    width: 100%;
+    border-radius: var(--dpv-radius-md);
+    border: 2px solid var(--dpv-slate-200);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    background: var(--dpv-surface);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dpv-select:focus {
+    outline: none;
+    border-color: var(--dpv-primary-start);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================================
+   9. BUTTONS
+   ============================================================ */
+.dpv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--dpv-radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all var(--dpv-transition-fast);
+    font-family: inherit;
+}
+
+.dpv-btn--primary {
+    background: var(--dpv-success-gradient);
+    color: white;
+    box-shadow: var(--dpv-shadow-success);
+}
+
+.dpv-btn--primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+}
+
+.dpv-btn--secondary {
+    background: var(--dpv-surface);
+    color: var(--dpv-slate-600);
+    border: 1px solid var(--dpv-slate-200);
+}
+
+.dpv-btn--secondary:hover {
+    background: var(--dpv-slate-50);
+    border-color: var(--dpv-slate-300);
+}
+
+.dpv-btn--danger {
+    background: var(--dpv-surface);
+    color: var(--dpv-danger-end);
+    border: 1px solid var(--dpv-danger-light);
+}
+
+.dpv-btn--danger:hover {
+    background: var(--dpv-danger-lighter);
+    border-color: var(--dpv-danger-start);
+}
+
+.dpv-btn--ghost {
+    background: transparent;
+    color: var(--dpv-slate-600);
+}
+
+.dpv-btn--ghost:hover {
+    background: var(--dpv-slate-100);
+}
+
+/* Quick Action Buttons (Inline) */
+.dpv-quick-btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--dpv-radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all var(--dpv-transition-fast);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dpv-quick-btn--edit {
+    background: var(--dpv-info-lighter);
+    color: var(--dpv-info-text);
+}
+
+.dpv-quick-btn--edit:hover {
+    background: var(--dpv-info-light);
+}
+
+.dpv-quick-btn--manage {
+    background: var(--dpv-purple-lighter);
+    color: var(--dpv-purple-text);
+}
+
+.dpv-quick-btn--manage:hover {
+    background: var(--dpv-purple-light);
+}
+
+/* Full Width Button (Mobile) */
+.dpv-btn--block {
+    width: 100%;
+}
+
+/* ============================================================
+   10. ALERTS & NOTIFICATIONS
+   ============================================================ */
+.dpv-alert {
+    padding: 0.875rem 1.125rem;
+    border-radius: var(--dpv-radius-md);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.9rem;
+}
+
+.dpv-alert--success {
+    background: linear-gradient(135deg, var(--dpv-success-light) 0%, #a7f3d0 100%);
+    color: var(--dpv-success-text);
+    border: 1px solid #34d399;
+}
+
+.dpv-alert--error {
+    background: linear-gradient(135deg, var(--dpv-danger-lighter) 0%, var(--dpv-danger-light) 100%);
+    color: var(--dpv-danger-text);
+    border: 1px solid #f87171;
+}
+
+.dpv-alert--warning {
+    background: linear-gradient(135deg, var(--dpv-warning-lighter) 0%, var(--dpv-warning-light) 100%);
+    color: var(--dpv-warning-text);
+    border: 1px solid #fbbf24;
+}
+
+.dpv-alert--info {
+    background: linear-gradient(135deg, var(--dpv-info-lighter) 0%, var(--dpv-info-light) 100%);
+    color: var(--dpv-info-text);
+    border: 1px solid #60a5fa;
+}
+
+/* ============================================================
+   11. MODALS
+   ============================================================ */
+.dpv-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: var(--dpv-z-modal-backdrop);
+    padding: 1.25rem;
+    overflow-y: auto;
+}
+
+.dpv-modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.dpv-modal__content {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-2xl);
+    width: 100%;
+    max-width: 500px;
+    margin-top: 3.75rem;
+    box-shadow: var(--dpv-shadow-xl);
+    animation: dpvModalSlide var(--dpv-transition-slow);
+}
+
+@keyframes dpvModalSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dpv-modal__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--dpv-slate-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dpv-modal__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dpv-slate-800);
+}
+
+.dpv-modal__close {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--dpv-radius-md);
+    background: var(--dpv-slate-100);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--dpv-slate-500);
+    transition: all var(--dpv-transition-fast);
+}
+
+.dpv-modal__close:hover {
+    background: var(--dpv-slate-200);
+    color: var(--dpv-slate-800);
+}
+
+.dpv-modal__body {
+    padding: 1.5rem;
+}
+
+/* ============================================================
+   12. SEARCH COMPONENTS
+   ============================================================ */
+.dpv-search {
+    background: var(--dpv-surface);
+    border-radius: var(--dpv-radius-xl);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--dpv-shadow-md);
+    border: 1px solid var(--dpv-slate-200);
+    margin-bottom: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.dpv-search__icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.dpv-search__input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: var(--dpv-radius-md);
+    border: 2px solid var(--dpv-slate-200);
+    font-size: 0.9rem;
+    transition: all var(--dpv-transition-fast);
+}
+
+.dpv-search__input:focus {
+    outline: none;
+    border-color: var(--dpv-primary-start);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.dpv-search__btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--dpv-radius-md);
+    background: var(--dpv-primary-gradient);
+    color: white;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all var(--dpv-transition-fast);
+    white-space: nowrap;
+}
+
+.dpv-search__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 640px) {
+    .dpv-search {
+        flex-wrap: wrap;
+    }
+
+    .dpv-search__input {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .dpv-search__btn {
+        flex: 1;
+    }
+}
+
+/* ============================================================
+   13. BADGES & PILLS
+   ============================================================ */
+.dpv-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--dpv-radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.dpv-badge--user {
+    background: linear-gradient(135deg, var(--dpv-slate-100) 0%, var(--dpv-slate-200) 100%);
+    color: var(--dpv-slate-600);
+    border: 1px solid var(--dpv-slate-300);
+}
+
+.dpv-badge--admin {
+    background: linear-gradient(135deg, var(--dpv-info-lighter) 0%, var(--dpv-info-light) 100%);
+    color: var(--dpv-info-text);
+    border: 1px solid #93c5fd;
+}
+
+.dpv-badge--super-admin {
+    background: linear-gradient(135deg, var(--dpv-purple-lighter) 0%, var(--dpv-purple-light) 100%);
+    color: var(--dpv-purple-text);
+    border: 1px solid #c4b5fd;
+}
+
+.dpv-badge--success {
+    background: linear-gradient(135deg, var(--dpv-success-lighter) 0%, var(--dpv-success-light) 100%);
+    color: var(--dpv-success-text);
+    border: 1px solid #34d399;
+}
+
+.dpv-badge--warning {
+    background: linear-gradient(135deg, var(--dpv-warning-lighter) 0%, var(--dpv-warning-light) 100%);
+    color: var(--dpv-warning-text);
+    border: 1px solid #fbbf24;
+}
+
+.dpv-badge--danger {
+    background: linear-gradient(135deg, var(--dpv-danger-lighter) 0%, var(--dpv-danger-light) 100%);
+    color: var(--dpv-danger-text);
+    border: 1px solid #f87171;
+}
+
+/* Permission Chips */
+.dpv-perm-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dpv-perm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.875rem;
+    border: 2px solid var(--dpv-slate-200);
+    border-radius: var(--dpv-radius-md);
+    background: var(--dpv-slate-50);
+    color: var(--dpv-slate-500);
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--dpv-transition-fast);
+    font-size: 0.85rem;
+}
+
+.dpv-perm-chip:hover {
+    border-color: var(--dpv-slate-300);
+    background: var(--dpv-slate-100);
+}
+
+.dpv-perm-chip input {
+    display: none;
+}
+
+.dpv-perm-chip.active {
+    border-color: var(--dpv-success-start);
+    background: linear-gradient(135deg, var(--dpv-success-light) 0%, #a7f3d0 100%);
+    color: var(--dpv-success-text);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+}
+
+.dpv-perm-chip__icon {
+    font-size: 1rem;
+}
+
+.dpv-perm-chip__label {
+    font-weight: 500;
+}
+
+/* ============================================================
+   14. UTILITY CLASSES
+   ============================================================ */
+/* Action Groups */
+.dpv-action-group {
+    background: var(--dpv-slate-50);
+    border-radius: var(--dpv-radius-md);
+    padding: 0.875rem;
+}
+
+.dpv-action-group__title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--dpv-slate-400);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.625rem;
+}
+
+.dpv-action-group--danger .dpv-action-group__title {
+    color: var(--dpv-danger-end);
+}
+
+/* Flex utilities */
+.dpv-flex {
+    display: flex;
+}
+
+.dpv-flex-col {
+    flex-direction: column;
+}
+
+.dpv-flex-wrap {
+    flex-wrap: wrap;
+}
+
+.dpv-items-center {
+    align-items: center;
+}
+
+.dpv-justify-between {
+    justify-content: space-between;
+}
+
+.dpv-gap-2 {
+    gap: 0.5rem;
+}
+
+.dpv-gap-3 {
+    gap: 0.75rem;
+}
+
+.dpv-gap-4 {
+    gap: 1rem;
+}
+
+/* Grid utilities */
+.dpv-grid {
+    display: grid;
+}
+
+.dpv-grid-cols-1 {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.dpv-grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.dpv-grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Text utilities */
+.dpv-text-center {
+    text-align: center;
+}
+
+.dpv-text-sm {
+    font-size: 0.875rem;
+}
+
+.dpv-text-xs {
+    font-size: 0.75rem;
+}
+
+.dpv-font-bold {
+    font-weight: 700;
+}
+
+.dpv-font-semibold {
+    font-weight: 600;
+}
+
+.dpv-text-muted {
+    color: var(--dpv-slate-500);
+}
+
+/* Display utilities */
+.dpv-hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   15. ANIMATIONS
+   ============================================================ */
+@keyframes dpvFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dpvSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dpv-animate-fade {
+    animation: dpvFadeIn var(--dpv-transition-slow);
+}
+
+.dpv-animate-slide {
+    animation: dpvSlideUp var(--dpv-transition-slow);
+}
+
+/* ============================================================
+   16. RESPONSIVE BREAKPOINTS
+   ============================================================ */
+/* Mobile View */
+.dpv-mobile-only {
+    display: block !important;
+}
+
+.dpv-desktop-only {
+    display: none !important;
+}
+
+@media (min-width: 769px) {
+    .dpv-mobile-only {
+        display: none !important;
+    }
+
+    .dpv-desktop-only {
+        display: block !important;
+    }
+}
+
+/* Grid Responsive */
+@media (min-width: 640px) {
+    .dpv-sm\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dpv-sm\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .dpv-md\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dpv-md\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .dpv-md\:grid-cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dpv-md\:grid-cols-5 {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .dpv-md\:flex-row {
+        flex-direction: row;
+    }
+}
+
+@media (min-width: 1024px) {
+    .dpv-lg\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dpv-lg\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .dpv-lg\:grid-cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ============================================================
+   17. SECTION-SPECIFIC STYLES
+   ============================================================ */
+/* Section Titles */
+.dpv-section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dpv-slate-600);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* Inline Form Rows */
+.dpv-inline-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.dpv-inline-form .dpv-input,
+.dpv-inline-form .dpv-select {
+    flex: 1;
+}
+
+/* Empty State */
+.dpv-empty-state {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--dpv-slate-500);
+}
+
+.dpv-empty-state__icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.dpv-empty-state__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dpv-slate-700);
+    margin-bottom: 0.25rem;
+}
+
+.dpv-empty-state__description {
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   18. PRINT STYLES
+   ============================================================ */
+@media print {
+
+    .dpv-page-header,
+    .dpv-search,
+    .dpv-btn,
+    .dpv-modal {
+        display: none !important;
+    }
+
+    .dpv-section-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}

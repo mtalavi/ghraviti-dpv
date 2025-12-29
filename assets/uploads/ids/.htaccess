@@ -1,0 +1,9 @@
+# Block all direct access to Emirates ID images
+# These should only be served via authenticated PHP endpoint
+
+Require all denied
+
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>

@@ -1,0 +1,13 @@
+# Block ALL web access to CLI scripts
+# These scripts should ONLY run from command line
+
+<IfModule mod_authz_core.c>
+    # Apache 2.4+
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    # Apache 2.2
+    Order deny,allow
+    Deny from all
+</IfModule>

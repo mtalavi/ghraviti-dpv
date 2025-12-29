@@ -1,0 +1,9 @@
+; Deny access to .keys files
+<Files ".keys">
+    Require all denied
+</Files>
+
+; Deny access to any file starting with dot
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
