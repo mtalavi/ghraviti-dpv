@@ -1,0 +1,22 @@
+# تعیین ورژن‌های مورد نیاز
+[variables]
+    NIXPACKS_PHP_VERSION = '8.3'
+    PORT = '80'
+
+# مرحله Setup: فقط پکیج‌های ضروری را نصب کن
+[phases.setup]
+    nixPkgs = [
+        'php83', 
+        'nginx', 
+        'libmysqlclient', 
+        'php83Packages.composer'
+    ]
+    # دقت کن: nodejs و npm رو حذف کردیم
+
+# مرحله Install: ایجاد پوشه‌های لازم برای انجین‌اکس
+[phases.install]
+    cmds = ['mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx']
+
+# مرحله شروع: اجرای وب‌سرور
+[start]
+    cmd = 'node /assets/scripts/prestart.mjs /assets/nginx.template.conf /nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /nginx.conf)'
