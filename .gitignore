@@ -1,0 +1,49 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Environment & Config
+.env
+.env.local
+.env.*.local
+config/local.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Uploads (user content)
+assets/uploads/avatars/*
+assets/uploads/emirates_id/*
+assets/uploads/qr/*
+!assets/uploads/avatars/.gitkeep
+!assets/uploads/emirates_id/.gitkeep
+!assets/uploads/qr/.gitkeep
+
+# Cache
+/cache/
+*.cache
+
+# Temporary files
+/tmp/
+*.tmp
+
+# Composer
+composer.lock
+
+# Sensitive files
+*.pem
+*.key
+*.crt
