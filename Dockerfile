@@ -20,8 +20,13 @@ COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Expose port 80
-EXPOSE 80
+# Configure Apache to use PORT environment variable (default 3000 for Coolify)
+ENV PORT=3000
+RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf \
+    && sed -i 's/:80/:${PORT}/g' /etc/apache2/sites-available/000-default.conf
+
+# Expose the dynamic port
+EXPOSE ${PORT}
 
 # Start Apache
 CMD ["apache2-foreground"]
