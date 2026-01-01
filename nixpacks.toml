@@ -1,30 +1,18 @@
-# PHP Application Configuration for Coolify/Nixpacks
+# Nixpacks Configuration for PHP Application
+# This tells Coolify how to build and run the app
 
-[variables]
-    NIXPACKS_PHP_VERSION = '8.3'
-    PORT = '80'
-
-# Setup phase: Install required packages
 [phases.setup]
     nixPkgs = [
         'php83',
         'php83Extensions.pdo_mysql',
-        'php83Extensions.openssl',
+        'php83Extensions.openssl', 
         'php83Extensions.mbstring',
         'php83Extensions.gd',
-        'nginx',
-        'libmysqlclient',
-        'php83Packages.composer'
+        'nginx'
     ]
 
-# Install phase: Create necessary directories
 [phases.install]
-    cmds = [
-        'mkdir -p /var/log/nginx',
-        'mkdir -p /var/cache/nginx',
-        'mkdir -p /run'
-    ]
+    cmds = ['mkdir -p /var/log/nginx /var/cache/nginx /run']
 
-# Start command: Run PHP-FPM and Nginx directly (no Node.js needed)
 [start]
-    cmd = 'php-fpm -y /assets/php-fpm.conf & nginx -g "daemon off;"'
+    cmd = 'php -S 0.0.0.0:80 -t /app'
