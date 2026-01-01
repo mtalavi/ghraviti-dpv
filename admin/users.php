@@ -323,57 +323,69 @@ if (!is_super_admin()) {
   // Admin only sees users they created
   $conditions[] = 'created_by = ' . (int) current_user()['id'];
 }
+
+// For search queries, we need to fetch all users first then filter client-side
+// because encrypted fields (full_name, email, mobile) cannot be searched with LIKE in SQL
 if ($q !== '') {
-  // For encrypted fields (email, mobile), we can only do exact match via blind index
-  // For dp_code and v_number, we can do LIKE since they're not encrypted
+  // First, try to find exact matches via blind index for email/mobile
   $emailHash = function_exists('blind_index') ? blind_index($q) : null;
   $mobileHash = function_exists('blind_index') ? blind_index($q) : null;
 
-  // Search: dp_code LIKE, v_number LIKE, OR exact match on email_hash/mobile_hash
+  // Build conditions for non-encrypted fields that can be searched with LIKE
   $searchParts = ["dp_code LIKE ?", "v_number LIKE ?"];
   $like = "%$q%";
-  $params[] = $like;
-  $params[] = $like;
+  $searchParams = [$like, $like];
 
   // Add blind index search for exact email/mobile match
   if ($emailHash) {
     $searchParts[] = "email_hash = ?";
-    $params[] = $emailHash;
+    $searchParams[] = $emailHash;
   }
   if ($mobileHash) {
     $searchParts[] = "mobile_hash = ?";
-    $params[] = $mobileHash;
+    $searchParams[] = $mobileHash;
   }
 
-  $conditions[] = "(" . implode(" OR ", $searchParts) . ")";
-}
-$whereClause = $conditions ? (' WHERE ' . implode(' AND ', $conditions)) : '';
-$sql = "SELECT id, dp_code, full_name, email, mobile, emirates_id, emirate, role, created_at, profile_photo, created_by FROM users" . $whereClause;
-$sql .= " ORDER BY created_at DESC LIMIT 200";
-$users = fetch_users_decrypted($sql, $params);
+  // We need to fetch ALL users (within role constraints) first, then filter
+  // because name search requires decryption
+  $whereClause = $conditions ? (' WHERE ' . implode(' AND ', $conditions)) : '';
+  $sql = "SELECT id, dp_code, v_number, full_name, full_name_ar, email, mobile, emirates_id, emirate, role, created_at, profile_photo, created_by FROM users" . $whereClause;
+  $sql .= " ORDER BY created_at DESC LIMIT 500"; // Higher limit for search to find matches
+  $users = fetch_users_decrypted($sql, $params);
 
-// Client-side filter for name search (since full_name is encrypted, we filter after decryption)
-if ($q !== '' && $users) {
-  $qLower = mb_strtolower($q);
-  $users = array_filter($users, function ($u) use ($qLower, $q) {
-    // Already matched by SQL? Keep it
-    if (stripos($u['dp_code'] ?? '', $q) !== false)
-      return true;
-    if (stripos($u['v_number'] ?? '', $q) !== false)
-      return true;
-    // Match on decrypted name
-    if (stripos($u['full_name'] ?? '', $q) !== false)
-      return true;
-    if (stripos($u['full_name_ar'] ?? '', $q) !== false)
-      return true;
-    // Match on decrypted email/mobile (for partial matches)
-    if (stripos($u['email'] ?? '', $q) !== false)
-      return true;
-    if (stripos($u['mobile'] ?? '', $q) !== false)
-      return true;
-    return false;
-  });
-  $users = array_values($users);
+  // Now filter client-side on all decrypted fields
+  if ($users) {
+    $users = array_filter($users, function ($u) use ($q) {
+      // Match on dp_code (case-insensitive)
+      if (stripos($u['dp_code'] ?? '', $q) !== false)
+        return true;
+      // Match on v_number
+      if (stripos($u['v_number'] ?? '', $q) !== false)
+        return true;
+      // Match on decrypted name (English)
+      if (stripos($u['full_name'] ?? '', $q) !== false)
+        return true;
+      // Match on decrypted name (Arabic)
+      if (stripos($u['full_name_ar'] ?? '', $q) !== false)
+        return true;
+      // Match on decrypted email (partial match)
+      if (stripos($u['email'] ?? '', $q) !== false)
+        return true;
+      // Match on decrypted mobile (partial match)
+      if (stripos($u['mobile'] ?? '', $q) !== false)
+        return true;
+      return false;
+    });
+    $users = array_values($users);
+    // Limit results after filtering
+    $users = array_slice($users, 0, 200);
+  }
+} else {
+  // No search query - just fetch with regular pagination
+  $whereClause = $conditions ? (' WHERE ' . implode(' AND ', $conditions)) : '';
+  $sql = "SELECT id, dp_code, full_name, email, mobile, emirates_id, emirate, role, created_at, profile_photo, created_by FROM users" . $whereClause;
+  $sql .= " ORDER BY created_at DESC LIMIT 200";
+  $users = fetch_users_decrypted($sql, $params);
 }
 
 // Persist filled values on validation errors
@@ -503,15 +515,14 @@ render_header('User Management');
         <label class="text-sm font-semibold text-slate-700">Emirate of Residence</label>
         <div class="choice-wrap grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1" role="group" aria-label="Emirate">
           <?php foreach (['Abu Dhabi (أبو ظبي)', 'Dubai (دبي)', 'Sharjah (الشارقة)', 'Ajman (عجمان)', 'Umm Al Quwain (أم القيوين)', 'Ras Al Khaimah (رأس الخيمة)', 'Fujairah (الفجيرة)'] as $em): ?>
-            <?php $active = (($old['emirate'] ?? 'Abu Dhabi (أبو ظبي)') === $em); ?>
+            <?php $active = (($old['emirate'] ?? 'Dubai (دبي)') === $em); ?>
             <button type="button" class="choice-btn <?= $active ? 'is-active' : '' ?>" data-choice="emirate"
               data-value="<?= $em ?>">
               <span class="choice-dot"></span><span><?= $em ?></span>
             </button>
           <?php endforeach; ?>
         </div>
-        <input type="hidden" name="emirate" id="emirateChoice"
-          value="<?= h($old['emirate'] ?? 'Abu Dhabi (أبو ظبي)') ?>">
+        <input type="hidden" name="emirate" id="emirateChoice" value="<?= h($old['emirate'] ?? 'Dubai (دبي)') ?>">
         <p class="text-xs text-slate-500 mt-1">Tap to pick your emirate.</p>
       </div>
       <div class="flex flex-col">
@@ -598,45 +609,45 @@ render_header('User Management');
     </form>
   </div>
 
-  <div class="bg-white rounded-3xl shadow border border-slate-100 p-6 space-y-4">
-    <div class="flex items-center justify-between gap-3">
-      <h2 class="text-lg font-semibold text-slate-900">Users</h2>
-      <form method="get" class="flex items-center gap-2">
-        <input type="text" name="q" value="<?= h($q) ?>" placeholder="Search DP, name, email, mobile"
-          class="input-field">
-        <button class="btn-ghost" type="submit">Search</button>
-      </form>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <?php if (!$users): ?>
-        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 col-span-full">No users found.
-        </div>
-      <?php endif; ?>
-      <?php foreach ($users as $row): ?>
-        <div class="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col items-center gap-3">
-          <?php if (!empty($row['profile_photo'])): ?>
-            <img src="<?= BASE_URL ?>/image.php?type=avatar&file=<?= urlencode(basename($row['profile_photo'])) ?>"
-              alt="avatar" class="w-20 h-20 rounded-2xl object-cover border border-slate-200">
-          <?php else: ?>
-            <div
-              class="w-20 h-20 rounded-2xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center border border-slate-200">
-              <?= h($row['dp_code']) ?>
-            </div>
-          <?php endif; ?>
-          <div class="text-center space-y-1">
-            <div class="font-mono font-semibold text-slate-900 text-sm"><?= h($row['dp_code']) ?></div>
-            <div class="text-base font-semibold text-slate-900 leading-tight"><?= h($row['full_name']) ?></div>
-            <?php if (is_super_admin() && !empty($row['created_by'])): ?>
-              <?php $creatorName = $creatorNames[(int) $row['created_by']] ?? null; ?>
-              <?php if ($creatorName): ?>
-                <div class="text-xs text-slate-500">👤 Added by: <?= h($creatorName) ?></div>
-              <?php endif; ?>
-            <?php endif; ?>
+  <?php if (is_super_admin()): ?>
+    <div class="bg-white rounded-3xl shadow border border-slate-100 p-6 space-y-4">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-slate-900">Users</h2>
+        <form method="get" class="flex items-center gap-2">
+          <input type="text" name="q" value="<?= h($q) ?>" placeholder="Search DP, name, email, mobile"
+            class="input-field">
+          <button class="btn-ghost" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <?php if (!$users): ?>
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-500 col-span-full">No users found.
           </div>
-          <div class="w-full flex flex-col gap-2">
-            <a class="btn-ghost w-full justify-center"
-              href="<?= BASE_URL ?>/admin/user_edit.php?id=<?= $row['id'] ?>">View</a>
-            <?php if (is_super_admin()): ?>
+        <?php endif; ?>
+        <?php foreach ($users as $row): ?>
+          <div class="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col items-center gap-3">
+            <?php if (!empty($row['profile_photo'])): ?>
+              <img src="<?= BASE_URL ?>/image.php?type=avatar&file=<?= urlencode(basename($row['profile_photo'])) ?>"
+                alt="avatar" class="w-20 h-20 rounded-2xl object-cover border border-slate-200">
+            <?php else: ?>
+              <div
+                class="w-20 h-20 rounded-2xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center border border-slate-200">
+                <?= h($row['dp_code']) ?>
+              </div>
+            <?php endif; ?>
+            <div class="text-center space-y-1">
+              <div class="font-mono font-semibold text-slate-900 text-sm"><?= h($row['dp_code']) ?></div>
+              <div class="text-base font-semibold text-slate-900 leading-tight"><?= h($row['full_name']) ?></div>
+              <?php if (!empty($row['created_by'])): ?>
+                <?php $creatorName = $creatorNames[(int) $row['created_by']] ?? null; ?>
+                <?php if ($creatorName): ?>
+                  <div class="text-xs text-slate-500">👤 Added by: <?= h($creatorName) ?></div>
+                <?php endif; ?>
+              <?php endif; ?>
+            </div>
+            <div class="w-full flex flex-col gap-2">
+              <a class="btn-ghost w-full justify-center"
+                href="<?= BASE_URL ?>/admin/user_edit.php?id=<?= $row['id'] ?>">View</a>
               <form method="post" onsubmit="return confirm('Delete this user?');" class="w-full">
                 <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
                 <input type="hidden" name="action" value="delete">
@@ -644,12 +655,12 @@ render_header('User Management');
                 <button class="w-full py-2 rounded-xl border border-red-200 text-red-700 font-semibold bg-red-50"
                   type="submit">Delete</button>
               </form>
-            <?php endif; ?>
+            </div>
           </div>
-        </div>
-      <?php endforeach; ?>
+        <?php endforeach; ?>
+      </div>
     </div>
-  </div>
+  <?php endif; ?>
 </div>
 <script>
   (function () {
