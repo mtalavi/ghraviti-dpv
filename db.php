@@ -9,13 +9,38 @@ function db()
     static $pdo = null;
     if ($pdo === null) {
         // Get credentials from Coolify environment variables
-        $host = getenv('DB_HOST') ?: 'mysql';
+        $dbHost = getenv('DB_HOST') ?: 'mysql';
         $name = getenv('DB_NAME') ?: 'dpvhub';
         $user = getenv('DB_USER') ?: 'mysql';
         $pass = getenv('DB_PASS') ?: 'yGqQqT4vPCrkWJAmj92cBhcArfzhQ9NPB5PcqDoP733pinueNuwRHVWHdZ6kYYUC';
+        $port = 3306;
+
+        // Parse MySQL URL format from Coolify: mysql://user:pass@host:port/database
+        if (strpos($dbHost, 'mysql://') === 0) {
+            $parsed = parse_url($dbHost);
+            $host = $parsed['host'] ?? 'mysql';
+            $port = $parsed['port'] ?? 3306;
+            // Use URL credentials if not separately provided
+            if ($user === 'mysql' && isset($parsed['user'])) {
+                $user = $parsed['user'];
+            }
+            if (isset($parsed['pass'])) {
+                $pass = $parsed['pass'];
+            }
+            // Use URL database name if DB_NAME is default
+            if ($name === 'dpvhub' && isset($parsed['path'])) {
+                $urlDbName = ltrim($parsed['path'], '/');
+                if ($urlDbName && $urlDbName !== 'default') {
+                    $name = $urlDbName;
+                }
+            }
+        } else {
+            // Simple hostname format
+            $host = $dbHost;
+        }
 
         $pdo = new PDO(
-            "mysql:host=$host;dbname=$name;charset=utf8mb4",
+            "mysql:host=$host;port=$port;dbname=$name;charset=utf8mb4",
             $user,
             $pass,
             [
