@@ -1,4 +1,4 @@
-name: Deploy to Coolify
+name: PHP Lint & Test
 
 on:
   push:
@@ -6,52 +6,11 @@ on:
       - main
     tags:
       - 'v*'
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Get version
-        id: version
-        run: |
-          if [ -f VERSION ]; then
-            echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
-          else
-            echo "version=dev" >> $GITHUB_OUTPUT
-          fi
-      
-      - name: Deploy to Coolify
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: ${{ secrets.COOLIFY_WEBHOOK_URL }}
-          method: 'POST'
-          customHeaders: '{"Authorization": "Bearer ${{ secrets.COOLIFY_TOKEN }}"}'
-          data: '{"version": "${{ steps.version.outputs.version }}"}'
-          timeout: 60000
-      
-      - name: Wait for deployment
-        run: sleep 30
-      
-      - name: Run database migrations
-        if: success()
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd ${{ secrets.APP_PATH }}
-            php cli/migrate.php
-      
-      - name: Notify success
-        if: success()
-        run: echo "✅ Deployed version ${{ steps.version.outputs.version }} to production"
-
   test:
     runs-on: ubuntu-latest
     
@@ -81,3 +40,9 @@ jobs:
         run: mysql -h 127.0.0.1 -u root -ptest dpvhub_test < dpvhub_db.sql
         env:
           MYSQL_PWD: test
+      
+      - name: Show version
+        run: |
+          if [ -f VERSION ]; then
+            echo "Version: $(cat VERSION)"
+          fi
