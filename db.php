@@ -1,14 +1,23 @@
 <?php
-require_once __DIR__ . '/config.php';
+/**
+ * Database connection for Coolify deployment
+ * All credentials are loaded from environment variables
+ */
 
 function db()
 {
     static $pdo = null;
     if ($pdo === null) {
+        // Get credentials from Coolify environment variables
+        $host = getenv('DB_HOST') ?: 'mysql';
+        $name = getenv('DB_NAME') ?: 'dpvhub';
+        $user = getenv('DB_USER') ?: 'mysql';
+        $pass = getenv('DB_PASS') ?: 'yGqQqT4vPCrkWJAmj92cBhcArfzhQ9NPB5PcqDoP733pinueNuwRHVWHdZ6kYYUC';
+
         $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-            DB_USER,
-            DB_PASS,
+            "mysql:host=$host;dbname=$name;charset=utf8mb4",
+            $user,
+            $pass,
             [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
