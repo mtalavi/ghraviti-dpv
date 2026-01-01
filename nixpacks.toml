@@ -1,22 +1,30 @@
-# تعیین ورژن‌های مورد نیاز
+# PHP Application Configuration for Coolify/Nixpacks
+
 [variables]
     NIXPACKS_PHP_VERSION = '8.3'
     PORT = '80'
 
-# مرحله Setup: فقط پکیج‌های ضروری را نصب کن
+# Setup phase: Install required packages
 [phases.setup]
     nixPkgs = [
-        'php83', 
-        'nginx', 
-        'libmysqlclient', 
+        'php83',
+        'php83Extensions.pdo_mysql',
+        'php83Extensions.openssl',
+        'php83Extensions.mbstring',
+        'php83Extensions.gd',
+        'nginx',
+        'libmysqlclient',
         'php83Packages.composer'
     ]
-    # دقت کن: nodejs و npm رو حذف کردیم
 
-# مرحله Install: ایجاد پوشه‌های لازم برای انجین‌اکس
+# Install phase: Create necessary directories
 [phases.install]
-    cmds = ['mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx']
+    cmds = [
+        'mkdir -p /var/log/nginx',
+        'mkdir -p /var/cache/nginx',
+        'mkdir -p /run'
+    ]
 
-# مرحله شروع: اجرای وب‌سرور
+# Start command: Run PHP-FPM and Nginx directly (no Node.js needed)
 [start]
-    cmd = 'node /assets/scripts/prestart.mjs /assets/nginx.template.conf /nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /nginx.conf)'
+    cmd = 'php-fpm -y /assets/php-fpm.conf & nginx -g "daemon off;"'

@@ -35,16 +35,14 @@ function load_secure_credentials(): array
 // Load credentials from secure file
 $secureCredentials = load_secure_credentials();
 
-// Database Configuration (only password is sensitive)
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'dpvhub_db');
-define('DB_USER', 'dpvhub_user');
+// Database Configuration for Coolify
+// Priority: Environment Variables > Hardcoded defaults
+define('DB_HOST', getenv('DB_HOST') ?: 'mysql');
+define('DB_NAME', getenv('DB_NAME') ?: 'dpvhub');
+define('DB_USER', getenv('DB_USER') ?: 'mysql');
 
-// Password from secure .dpv_keys file
-$dbPass = $secureCredentials['DB_PASS'] ?? getenv('DB_PASS');
-if (!$dbPass) {
-    die('CRITICAL: DB_PASS not found in .dpv_keys file!');
-}
+// Password: ENV variable > .dpv_keys file > hardcoded
+$dbPass = getenv('DB_PASS') ?: ($secureCredentials['DB_PASS'] ?? 'yGqQqT4vPCrkWJAmj92cBhcArfzhQ9NPB5PcqDoP733pinueNuwRHVWHdZ6kYYUC');
 define('DB_PASS', $dbPass);
 
 // Brevo API Key for email sending
