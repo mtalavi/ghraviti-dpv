@@ -1,104 +1,87 @@
 <# 
 .SYNOPSIS
     Automated Release Script for DPV Hub (PowerShell)
-.DESCRIPTION
-    Creates a new release with semantic versioning, updates CHANGELOG,
-    creates git tag and pushes to remote.
-.PARAMETER BumpType
-    Type of version bump: major, minor, or patch (default: patch)
 .EXAMPLE
-    .\release.ps1 patch   # 1.0.0 -> 1.0.1 (bug fixes)
-    .\release.ps1 minor   # 1.0.0 -> 1.1.0 (new features)  
-    .\release.ps1 major   # 1.0.0 -> 2.0.0 (breaking changes)
+    .\release.ps1           # 1.0.0 -> 1.0.1 (patch)
+    .\release.ps1 minor     # 1.0.0 -> 1.1.0
+    .\release.ps1 major     # 1.0.0 -> 2.0.0
+    .\release.ps1 -Auto     # No confirmation prompt
 #>
 
 param(
     [ValidateSet("major", "minor", "patch")]
-    [string]$BumpType = "patch"
+    [string]$BumpType = "patch",
+    [switch]$Auto
 )
 
 $ErrorActionPreference = "Stop"
 
-# Paths
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+# Paths - handle both running from scripts/ or from project root
+$ScriptDir = $PSScriptRoot
+if ($ScriptDir -eq "") { $ScriptDir = Get-Location }
+
+$ProjectRoot = if (Test-Path (Join-Path $ScriptDir "..\VERSION")) {
+    Split-Path -Parent $ScriptDir
+} else {
+    $ScriptDir
+}
+
 $VersionFile = Join-Path $ProjectRoot "VERSION"
 $ChangelogFile = Join-Path $ProjectRoot "CHANGELOG.md"
 
 # Check VERSION file
 if (-not (Test-Path $VersionFile)) {
     Write-Host "ERROR: VERSION file not found at $VersionFile" -ForegroundColor Red
-    exit 1
+    Write-Host "Creating VERSION file with 1.0.0..."
+    Set-Content -Path $VersionFile -Value "1.0.0" -NoNewline
 }
 
 # Read current version
 $CurrentVersion = (Get-Content $VersionFile -Raw).Trim()
-Write-Host "Current version: " -NoNewline
-Write-Host $CurrentVersion -ForegroundColor Yellow
+Write-Host "Current version: $CurrentVersion" -ForegroundColor Yellow
 
 # Parse version
 $VersionParts = $CurrentVersion -split '\.'
 $Major = [int]$VersionParts[0]
-$Minor = [int]$VersionParts[1]
-$Patch = [int]$VersionParts[2]
+$Minor = if ($VersionParts.Length -gt 1) { [int]$VersionParts[1] } else { 0 }
+$Patch = if ($VersionParts.Length -gt 2) { [int]$VersionParts[2] } else { 0 }
 
 # Calculate new version
 switch ($BumpType) {
-    "major" {
-        $Major++
-        $Minor = 0
-        $Patch = 0
-    }
-    "minor" {
-        $Minor++
-        $Patch = 0
-    }
-    "patch" {
-        $Patch++
-    }
+    "major" { $Major++; $Minor = 0; $Patch = 0 }
+    "minor" { $Minor++; $Patch = 0 }
+    "patch" { $Patch++ }
 }
 
 $NewVersion = "$Major.$Minor.$Patch"
-Write-Host "New version: " -NoNewline
-Write-Host $NewVersion -ForegroundColor Green
+Write-Host "New version: $NewVersion" -ForegroundColor Green
 
-# Confirm
-$Confirm = Read-Host "Create release v$NewVersion? (y/n)"
-if ($Confirm -ne 'y' -and $Confirm -ne 'Y') {
-    Write-Host "Aborted." -ForegroundColor Yellow
-    exit 0
+# Confirm (unless -Auto)
+if (-not $Auto) {
+    $Confirm = Read-Host "Create release v$NewVersion? (y/n)"
+    if ($Confirm -ne 'y' -and $Confirm -ne 'Y') {
+        Write-Host "Aborted." -ForegroundColor Yellow
+        exit 0
+    }
 }
 
 # Update VERSION file
 Set-Content -Path $VersionFile -Value $NewVersion -NoNewline
-Write-Host "✓ Updated VERSION file" -ForegroundColor Green
+Write-Host "[OK] Updated VERSION file" -ForegroundColor Green
 
 # Update CHANGELOG
 $Today = Get-Date -Format "yyyy-MM-dd"
 if (Test-Path $ChangelogFile) {
     $ChangelogContent = Get-Content $ChangelogFile -Raw
-    $NewSection = @"
-## [Unreleased]
-
-### Added
-- Nothing yet
-
-### Changed
-- Nothing yet
-
-### Fixed
-- Nothing yet
-
----
-
-## [$NewVersion] - $Today
-"@
+    $NewSection = "## [Unreleased]`n`n### Added`n- Nothing yet`n`n### Changed`n- Nothing yet`n`n### Fixed`n- Nothing yet`n`n---`n`n## [$NewVersion] - $Today"
     $ChangelogContent = $ChangelogContent -replace '## \[Unreleased\]', $NewSection
     Set-Content -Path $ChangelogFile -Value $ChangelogContent
-    Write-Host "✓ Updated CHANGELOG.md" -ForegroundColor Green
+    Write-Host "[OK] Updated CHANGELOG.md" -ForegroundColor Green
 }
 
 # Git operations
 Write-Host "Committing changes..." -ForegroundColor Cyan
+Set-Location $ProjectRoot
 git add -A
 git commit -m "Release v$NewVersion"
 
@@ -110,9 +93,6 @@ git push origin main
 git push origin "v$NewVersion"
 
 Write-Host ""
-Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green
-Write-Host "  ✓ Release v$NewVersion created successfully!" -ForegroundColor Green
-Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green
-Write-Host ""
-Write-Host "To view all releases: git tag --list"
-Write-Host "To checkout a release: git checkout v$NewVersion"
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "  Release v$NewVersion created!" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
